@@ -45,6 +45,13 @@ Contact.prototype.fullName = function() {
 let addressBook = new AddressBook();
 
 //function that diplays contacts in DOM. Takes address book object as an argument
+//we save the div that will contain contacts in a variable called contactsDiv
+//next we created claear the innerText of contactsDiv. clears list of contacts before its populated. we do this because our code is set up to loop through all contacts. now user can submit form over and over to create new contacts
+//then empty unordered list element. during each loop we'll add new list items to unordered list
+//next Object.keys() to get all the keys from addressbooktodisplay.contacts so we can iterate through them. Object.keys() returns an array.
+//then array.prototype.foreach() to loop through object keys
+//in loop- grab contact object by using addressbook.prototype.findcontact() method, create new list item element for the contact and id attribute equal to contacts id propert, then add newly created list item to unordered list
+//after loop finished and list populated, we update the DOM by appending unordered list to the contactsDiv element. 
 function listContacts(addressBookToDisplay) {
   let contactsDiv = document.querySelector("div#contacts");
   contactsDiv.innerText =  null;
@@ -59,10 +66,21 @@ function listContacts(addressBookToDisplay) {
   contactsDiv.append(ul);
 }
 
+//utilizing addressbook.prototype.findcontact() method-we can use here because addressbook is globally scoped
+//access spans in DOM to print contacts name and number
+//then, show the hidden contact details div with contacts full info
+function displayContactDetails(event) {
+  const contact = addressBook.findContact(event.target.id);
+  document.querySelector(".first-name").innerText = contact.firstName;
+  document.querySelector(".last-name").innerText = contact.lastName;
+  document.querySelector(".phone-number").innerText = contact.phoneNumber;
+  document.querySelector("div#contact-details").removeAttribute("class");
+}
+
 //define function handle form submission in window load event listener
 //we call prevent default to prevent page refresh, gather user uput from form, create new contact object
 //add new contact by using address book .prototype .addContact() method
-//log list of contacts to console to doible check new contact has been added
+//calls list contact function whenever we add new contact
 function handleFormSubmission(event) {
   event.preventDefault();
   const inputtedFirstName = document.querySelector("input#new-first-name").value;
@@ -70,10 +88,12 @@ function handleFormSubmission(event) {
   const inputtedPhoneNumber = document.querySelector("input#new-phone-number").value;
   let newContact = new Contact(inputtedFirstName, inputtedLastName, inputtedPhoneNumber);
   addressBook.addContact(newContact);
-  console.log(addressBook.contacts);
+  listContacts(addressBook);
 }
 
 //event listener for load event. called when page has loaded all resources. 
+//event listener then for click event on contacts div and anything inside it
 window.addEventListener("load", function (){
   document.querySelector("form#new-contact").addEventListener("submit", handleFormSubmission);
+  document.querySelector("div#contacts").addEventListener("click", displayContactDetails);   
 });
