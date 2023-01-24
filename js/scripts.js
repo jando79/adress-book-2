@@ -1,19 +1,22 @@
 // Business Logic for AddressBook ---------
+//empty container
 function AddressBook() {
   this.contacts = {};
   this.currentId = 0;
 }
-
+//stuff we add to it
 AddressBook.prototype.addContact = function(contact) {
   contact.id = this.assignId();
   this.contacts[contact.id] = contact;
 };
 
+//container increases by 1 everytime we add to it
 AddressBook.prototype.assignId = function() {
   this.currentId += 1;
   return this.currentId;
 };
 
+//allows search for specific id (contact in this case), returns contact if it exists, or returns false if it doesn't
 AddressBook.prototype.findContact = function(id) {
   if (this.contacts[id] !== undefined) {
     return this.contacts[id];
@@ -21,6 +24,7 @@ AddressBook.prototype.findContact = function(id) {
   return false;
 };
 
+//deletes if it exists, false if it doesn't
 AddressBook.prototype.deleteContact = function(id) {
   if (this.contacts[id] === undefined) {
     return false;
@@ -30,18 +34,24 @@ AddressBook.prototype.deleteContact = function(id) {
 };
 
 // Business Logic for Contacts ---------
-function Contact(firstName, lastName, phoneNumber) {
+
+//construct is contact, this. is the stuff inside of it. the = is the label on the box of stuff
+function Contact(firstName, lastName, phoneNumber, email, address) {
   this.firstName = firstName;
   this.lastName = lastName;
   this.phoneNumber = phoneNumber;
+  this.email = email;
+  this.address = address;
 }
 
+//how variable is labeled in the DOM
 Contact.prototype.fullName = function() {
   return this.firstName + " " + this.lastName;
 };
 
 //User Interface Logic
 //variable is global because declared at top level of our file. generally avoid, but here it mimics a database
+//making construct
 let addressBook = new AddressBook();
 
 //function that diplays contacts in DOM. Takes address book object as an argument
@@ -74,6 +84,9 @@ function displayContactDetails(event) {
   document.querySelector(".first-name").innerText = contact.firstName;
   document.querySelector(".last-name").innerText = contact.lastName;
   document.querySelector(".phone-number").innerText = contact.phoneNumber;
+  document.querySelector(".email").innerText = contact.email;
+  document.querySelector(".address").innerText = contact.address;
+  document.querySelector("button.delete").setAttribute("id", contact.id);
   document.querySelector("div#contact-details").removeAttribute("class");
 }
 
@@ -86,8 +99,22 @@ function handleFormSubmission(event) {
   const inputtedFirstName = document.querySelector("input#new-first-name").value;
   const inputtedLastName = document.querySelector("input#new-last-name").value;
   const inputtedPhoneNumber = document.querySelector("input#new-phone-number").value;
-  let newContact = new Contact(inputtedFirstName, inputtedLastName, inputtedPhoneNumber);
+  const inputtedEmail = document.querySelector("input#new-email").value;
+  const inputtedAddress = document.querySelector("input#new-address").value;
+  let newContact = new Contact(inputtedFirstName, inputtedLastName, inputtedPhoneNumber,inputtedEmail, inputtedAddress);
   addressBook.addContact(newContact);
+  listContacts(addressBook);
+  document.querySelector("input#new-first-name").value = null;
+  document.querySelector("input#new-last-name").value = null;
+  document.querySelector("input#new-phone-number").value = null;
+  document.querySelector("input#new-email").value = null;
+  document.querySelector("input#new-address").value = null;
+}
+
+function handleDelete(event) {
+  addressBook.deleteContact(event.target.id);
+  document.querySelector("button.delete").removeAttribute("id");
+  document.querySelector("div#contact-details").setAttribute("class", "hidden");
   listContacts(addressBook);
 }
 
@@ -96,4 +123,5 @@ function handleFormSubmission(event) {
 window.addEventListener("load", function (){
   document.querySelector("form#new-contact").addEventListener("submit", handleFormSubmission);
   document.querySelector("div#contacts").addEventListener("click", displayContactDetails);   
+  document.querySelector("button.delete").addEventListener("click", handleDelete);
 });

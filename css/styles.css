@@ -1,3 +1,9 @@
 .hidden {
   display: none;
 }
+
+body {
+  background-color: rgb(245, 171, 34);
+  color: rgb(56, 44, 44);
+  text-align: center;
+}
